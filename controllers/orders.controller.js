@@ -1,5 +1,7 @@
 const { base64EncodeRFC2045 } = require("../helpers/util");
 const axios = require('axios');
+const { createOrderKornitXModel, getOrderKornitXModel, updateOrderKornitXModel } = require("../models/orders.model");
+const mongoose = require('mongoose');
 
 const updateStatus = async (req, res) => {
     try {
@@ -34,17 +36,37 @@ const updateStatus = async (req, res) => {
                 console.log(response.data);
             })
             .catch(error => {
-                Mark_as_Shipped = error.message || error.response.Message;
                 console.error('Error:', error.response ? error.response.data : error.message);
             });
         }
-        
-        //Save KornitX Data in Railway DB
 
-        //Update Database in MongoDB
+        //Save KornitX Data in Railway DB
+        const data = {
+            ctp_id: id,
+            external_ref,
+            ref,
+            status,
+            status_name,
+            shipping_tracking,
+            shipping_method,
+            shipping_carrier,
+            order_id: orderID
+        }
+
+        const [exist] = await getOrderKornitXModel(orderID);
+        let resulOrder;
+
+        if (exist.length > 0) {
+            await updateOrderKornitXModel(data, orderID);
+            resulOrder = `La orden ${orderID} fue actualizada`
+        } else {
+            await createOrderKornitXModel(data);
+            resulOrder = `Se inserto la orden ${orderID}`
+        }         
 
         res.send({
             orderID,
+            resulOrder
         });
 
     } catch (error) {
