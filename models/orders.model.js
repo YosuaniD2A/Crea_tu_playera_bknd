@@ -6,6 +6,10 @@ const getOrderKornitXModel = (order_id) => {
     return db.query("SELECT * FROM ctp_orders_kornitx WHERE order_id = ?", [order_id]);
 }
 
+const getKornitXResponsesModel = () => {
+    return db.query("SELECT * FROM ctp_orders_kornitx")
+}
+
 const createOrderKornitXModel = (data) => {
     return db.query(
         `INSERT INTO ctp_orders_kornitx 
@@ -23,6 +27,7 @@ const updateOrderKornitXModel = (data, order_id) => {
 
 module.exports = {
     getOrderKornitXModel,
+    getKornitXResponsesModel,
     createOrderKornitXModel,
     updateOrderKornitXModel
 }

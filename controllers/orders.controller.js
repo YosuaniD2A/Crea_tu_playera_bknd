@@ -1,6 +1,6 @@
 const { base64EncodeRFC2045 } = require("../helpers/util");
 const axios = require('axios');
-const { createOrderKornitXModel, getOrderKornitXModel, updateOrderKornitXModel } = require("../models/orders.model");
+const { createOrderKornitXModel, getOrderKornitXModel, updateOrderKornitXModel, getKornitXResponsesModel } = require("../models/orders.model");
 
 const updateStatus = async (req, res) => {
     try {
@@ -75,7 +75,23 @@ const updateStatus = async (req, res) => {
     }
 }
 
+const getKornitXResponses = async (req, res) => {
+    try {
+        const [data] = await getKornitXResponsesModel();
+
+        res.send({
+            data
+        });
+        
+    } catch (error) {
+        res.status(500).json({
+            msg: error.message,
+        });
+    }
+}
+
 module.exports = {
-    updateStatus
+    updateStatus,
+    getKornitXResponses
 }
 
