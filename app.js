@@ -4,9 +4,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const logger = require('morgan');
+const mongoose = require('mongoose');
 
 const indexRouter = require('./routes/index.routes');
 const ordersRouter = require('./routes/orders.routes');
+const { error } = require('console');
 
 const app = express();
 require('dotenv').config();
@@ -18,6 +20,15 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin', 'Access-Control-Allow-Methods'],
   optionsSuccessStatus: 200
 };
+
+// MongoDb connection
+mongoose.connect(process.env.DB_MG_CONNECT)
+.then(()=>{
+  console.log('MongoDB connected');
+})
+.catch(error => {
+  console.log(error);
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
