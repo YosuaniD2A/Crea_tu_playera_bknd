@@ -1,7 +1,6 @@
 const { base64EncodeRFC2045 } = require("../helpers/util");
 const axios = require('axios');
 const { createOrderKornitXModel, getOrderKornitXModel, updateOrderKornitXModel } = require("../models/orders.model");
-const mongoose = require('mongoose');
 
 const updateStatus = async (req, res) => {
     try {
