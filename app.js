@@ -30,8 +30,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api-d2america/', indexRouter);
-app.use('/api-d2america/orders', ordersRouter);
+app.use('/v1/', indexRouter);
+app.use('/v1/orders', ordersRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
