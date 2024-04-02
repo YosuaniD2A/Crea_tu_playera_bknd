@@ -24,7 +24,6 @@ const updateStatus = async (req, res) => {
                 notifySalesChannel: true
             };
 
-            console.log(payload);
             axios.post(process.env.SHIP_URL_MARKASSHIPPED, payload, {
                 headers: {
                     'Authorization': `Basic ${authorizationToken}`,
