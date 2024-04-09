@@ -8,9 +8,9 @@ const updateStatus = async (req, res) => {
         const { id, external_ref, ref, status, status_name, shipping_tracking, shipping_method, shipping_carrier } = req.body;
 
         // Verificar si todos los campos requeridos están presentes
-        if (!(id && external_ref && ref && status && status_name && shipping_tracking && shipping_method && shipping_carrier)) {
-            return res.status(400).json({ error: 'El cuerpo de la solicitud no tiene la estructura esperada.' });
-        }
+        // if (!(id && external_ref && ref && status && status_name && shipping_tracking && shipping_method && shipping_carrier)) {
+        //     return res.status(400).json({ error: 'El cuerpo de la solicitud no tiene la estructura esperada.' });
+        // }
 
         //Make Order as Shipped in Shipstation
         if (status === 8) {
