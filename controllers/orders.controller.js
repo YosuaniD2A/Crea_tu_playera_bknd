@@ -13,30 +13,30 @@ const updateStatus = async (req, res) => {
         // }
 
         //Make Order as Shipped in Shipstation
-        if (status === 8) {
-            const authorizationToken = base64EncodeRFC2045(process.env.SHIP_API_KEY, process.env.SHIP_API_SECRET);
-            const payload = {
-                orderId: orderID,
-                carrierCode: shipping_carrier,
-                shipDate: new Date().toISOString().split('T')[0],
-                trackingNumber: shipping_tracking,
-                notifyCustomer: true,
-                notifySalesChannel: true
-            };
+        // if (status === 8) {
+        //     const authorizationToken = base64EncodeRFC2045(process.env.SHIP_API_KEY, process.env.SHIP_API_SECRET);
+        //     const payload = {
+        //         orderId: orderID,
+        //         carrierCode: shipping_carrier,
+        //         shipDate: new Date().toISOString().split('T')[0],
+        //         trackingNumber: shipping_tracking,
+        //         notifyCustomer: true,
+        //         notifySalesChannel: true
+        //     };
 
-            axios.post(process.env.SHIP_URL_MARKASSHIPPED, payload, {
-                headers: {
-                    'Authorization': `Basic ${authorizationToken}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.error('Error:', error.response ? error.response.data : error.message);
-            });
-        }
+        //     axios.post(process.env.SHIP_URL_MARKASSHIPPED, payload, {
+        //         headers: {
+        //             'Authorization': `Basic ${authorizationToken}`,
+        //             'Content-Type': 'application/json'
+        //         }
+        //     })
+        //     .then(response => {
+        //         console.log(response.data);
+        //     })
+        //     .catch(error => {
+        //         console.error('Error:', error.response ? error.response.data : error.message);
+        //     });
+        // }
 
         //Save KornitX Data in Railway DB
         const data = {
