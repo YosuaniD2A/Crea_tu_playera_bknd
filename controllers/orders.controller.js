@@ -1,42 +1,9 @@
-const { base64EncodeRFC2045 } = require("../helpers/util");
-const axios = require('axios');
-const { createOrderKornitXModel, getOrderKornitXModel, updateOrderKornitXModel, getKornitXResponsesModel } = require("../models/orders.model");
+const { createOrderKornitXModel, getOrderKornitXModel, updateOrderKornitXModel, getKornitXResponsesModel, updateOrderSwiftPodModel, createOrderSwiftPodModel, getOrderSwiftPodModel } = require("../models/orders.model");
 
 const updateStatus = async (req, res) => {
     try {
         const orderID = req.params.orderID
         const { id, external_ref, ref, status, status_name, shipping_tracking, shipping_method, shipping_carrier } = req.body;
-
-        // Verificar si todos los campos requeridos están presentes
-        // if (!(id && external_ref && ref && status && status_name && shipping_tracking && shipping_method && shipping_carrier)) {
-        //     return res.status(400).json({ error: 'El cuerpo de la solicitud no tiene la estructura esperada.' });
-        // }
-
-        //Make Order as Shipped in Shipstation
-        // if (status === 8) {
-        //     const authorizationToken = base64EncodeRFC2045(process.env.SHIP_API_KEY, process.env.SHIP_API_SECRET);
-        //     const payload = {
-        //         orderId: orderID,
-        //         carrierCode: shipping_carrier,
-        //         shipDate: new Date().toISOString().split('T')[0],
-        //         trackingNumber: shipping_tracking,
-        //         notifyCustomer: true,
-        //         notifySalesChannel: true
-        //     };
-
-        //     axios.post(process.env.SHIP_URL_MARKASSHIPPED, payload, {
-        //         headers: {
-        //             'Authorization': `Basic ${authorizationToken}`,
-        //             'Content-Type': 'application/json'
-        //         }
-        //     })
-        //     .then(response => {
-        //         console.log(response.data);
-        //     })
-        //     .catch(error => {
-        //         console.error('Error:', error.response ? error.response.data : error.message);
-        //     });
-        // }
 
         //Save KornitX Data in Railway DB
         const data = {
@@ -75,23 +42,76 @@ const updateStatus = async (req, res) => {
     }
 }
 
-const getKornitXResponses = async (req, res) => {
+const notifyOrderStatusSwiftPod = async (req, res) => {
     try {
-        const [data] = await getKornitXResponsesModel();
+        const { event, data } = req.body;
+        const orderStatus = {
+            order_id: data.order_id,
+            swiftpod_id: data.id,
+            status: data.status,
+            date_change: event.timestamp
+        }
+
+        const [exist] = await getOrderSwiftPodModel(orderStatus.order_id);
+        let resulOrder;
+
+        if (exist.length > 0) {
+            await updateOrderSwiftPodModel(orderStatus, orderStatus.order_id);
+            resulOrder = `La orden ${orderStatus.order_id} fue actualizada`
+        } else {
+            await createOrderSwiftPodModel(orderStatus);
+            resulOrder = `Se inserto la orden ${orderStatus.order_id}`
+        } 
 
         res.send({
-            data
+            orderID: orderStatus.order_id,
+            resulOrder
         });
-        
+
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             msg: error.message,
         });
     }
 }
 
+const notifyOrderTrackingSwiftPod = async (req, res) => {
+    try {
+        const { event, data } = req.body;
+        const orderShipment = {
+            tracking_number: event.tracking.tracking_number,
+            tracking_status: event.tracking.tracking_status,
+            tracking_code: event.tracking.carrier_code,
+            tracking_url: event.tracking.tracking_url,
+            date_tracking: event.timestamp
+        };
+
+        const [result] = await updateOrderSwiftPodModel(orderShipment, data.order_id);
+        if(result.affectedRows == 0){
+            res.send({
+                orderID: data.order_id,
+                resulOrder: 'No se encontraron coincidencias'
+            });
+        }else{
+            res.send({
+                orderID: data.order_id,
+                resulOrder: `La orden ${data.order_id} fue actualizada`
+            });
+        }        
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: error.message,
+        });
+    }
+}
+
+
 module.exports = {
     updateStatus,
-    getKornitXResponses
+    notifyOrderStatusSwiftPod,
+    notifyOrderTrackingSwiftPod
 }
 

@@ -6,10 +6,6 @@ const getOrderKornitXModel = (order_id) => {
     return db.query("SELECT * FROM ctp_orders_kornitx WHERE order_id = ?", [order_id]);
 }
 
-const getKornitXResponsesModel = () => {
-    return db.query("SELECT * FROM ctp_orders_kornitx")
-}
-
 const createOrderKornitXModel = (data) => {
     return db.query(
         `INSERT INTO ctp_orders_kornitx 
@@ -25,9 +21,34 @@ const updateOrderKornitXModel = (data, order_id) => {
         [...Object.values(data), order_id]);
 }
 
+/* -------------------------- SwiftPod ---------------------------------------------- */
+
+const getOrderSwiftPodModel = (order_id) => {
+    return db.query("SELECT * FROM sfp_orders_webhooks WHERE order_id = ?", [order_id]);
+}
+
+const createOrderSwiftPodModel = (data) => {
+    return db.query(
+        `INSERT INTO sfp_orders_webhooks 
+            (order_id, swiftpod_id, status, date_change)
+         VALUES (?, ?, ?, ?)`,
+         [data.order_id, data.swiftpod_id, data.status, data.date_change]);
+}
+
+const updateOrderSwiftPodModel = (data, order_id) => {
+    const fieldsToUpdate = Object.keys(data).map(key => `${key} = ?`).join(', ');
+
+    return db.query(`UPDATE sfp_orders_webhooks SET ${fieldsToUpdate} WHERE order_id = ?`,
+        [...Object.values(data), order_id]);
+}
+
+
 module.exports = {
     getOrderKornitXModel,
-    getKornitXResponsesModel,
     createOrderKornitXModel,
-    updateOrderKornitXModel
+    updateOrderKornitXModel,
+
+    getOrderSwiftPodModel,
+    createOrderSwiftPodModel,
+    updateOrderSwiftPodModel
 }
